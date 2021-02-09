@@ -1,15 +1,67 @@
 import tweepy
-consumerKey = 'ldbZte7f6sWNjil4nRvr2KqfK'
-consumerSecret = 'J2TMLInVqvKx4fncBB3db1oc9KbRch2jj2UoMASRrikLJh3v2P'
-accessToken = '1354446685670264836-yxFzwreEscrqRVgVmNO29wbNHVN5j6'
-accessTokenSecret = 'FmAnUvYHONF9RRbfJ59AM0ImAuZr9M1b9m6dOtNawk0We'
+from textblob import TextBlob
+import dataset 
+import settings
+from sqlalchemy.exc import ProgrammingError
+import json
+
+#db = dataset.connect("sqlite:///tweets.db")
+db = dataset.connect(settings.CONNECTION_STRING)
+
+consumerKey = 'tNR4XEQAjcNhemWhESdgJD36V'
+consumerSecret = 'bpfPt6822IBvlPTG7FoZsYvHxJCGlayFq5Y9kC5q6M4MSpXldc'
+accessToken = '711852590028365828-moNblbd17ILQIaRWYqm1PqfvqsBaF3d'
+accessTokenSecret = 'g9zcBGTLPl8L7ZqkwxkbwlDaG7SOPUgUXgXuRFn0JBbkd'
 
 class TwitterStreamListener(tweepy.streaming.StreamListener):
     ''' Handles data received from the stream. '''
+    '''
+        We want to look at how people feel about each presidential candidate. 
+        This means that we want to ignore retweets. 
+        Retweets show up in the stream of data from the Twitter API,
+        but the same text can show up hundreds or thousands of 
+        times. This will skew our results, as 
+        one person’s tweet will effectively count thousands of times in our analysis. 
+    '''
     def on_status(self, status):
-        print(status.id)
-        print(status.user.name)
-        print(status.text)
+        if status.retweeted:
+            return
+        description = status.user.description
+        loc = status.user.location
+        text = status.text
+        coords = status.coordinates
+        name = status.user.screen_name
+        user_created = status.user.created_at
+        followers = status.user.followers_count
+        id_str = status.id_str
+        created = status.created_at
+        retweets = status.retweet_count
+        bg_color = status.user.profile_background_color
+        blob = TextBlob(text)
+        sent = blob.sentiment
+        polarity = sent.polarity
+        subjectivity = sent.subjectivity
+            
+        if coords is not None:
+            coords = json.dumps(coords)
+
+        table = db[settings.TABLE_NAME]
+        table.insert(dict(
+        user_description=description,
+        user_location=loc,
+        coordinates=coords,
+        text=text,
+        user_name=name,
+        user_created=user_created,
+        user_followers=followers,
+        id_str=id_str,
+        created=created,
+        retweet_count=retweets,
+        user_bg_color=bg_color,
+        polarity=sent.polarity,
+        subjectivity=sent.subjectivity,))
+
+
         return True
 
     def on_error(self, status_code):
@@ -20,8 +72,15 @@ class TwitterStreamListener(tweepy.streaming.StreamListener):
         print('Timeout...')
         return True 
 
+    '''We want to look at how people feel about each presidential candidate. 
+    This means that we want to ignore retweets. 
+    Retweets show up in the stream of data from the Twitter API,
+    but the same text can show up hundreds or thousands of 
+    times. This will skew our results, as 
+    one person’s tweet will effectively count thousands of times in our analysis. 
+    '''
 listener = TwitterStreamListener()
 auth = tweepy.OAuthHandler(consumerKey, consumerSecret)
 auth.set_access_token(accessToken, accessTokenSecret)
 stream = tweepy.streaming.Stream(auth, listener)
-stream.filter(track=['#Tesla'])
+stream.filter(track=settings.TRACK_TERMS)
