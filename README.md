@@ -5,4 +5,6 @@ Performance Evaluation of Real time tweets for business analytics using AWS Sage
 1.pip install tensorflow
 2.pip install transformers
 3.pip install sentencepiece
+#DOWNLOAD LINK FOR MODEL
+https://drive.google.com/drive/folders/1LzPqE5LaGSJByModbTj4RlBNDpUKfn3z?usp=sharing
 
