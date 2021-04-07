@@ -4,6 +4,7 @@ import dataset
 import settings
 from sqlalchemy.exc import ProgrammingError
 import json
+import emoji
 
 #db = dataset.connect("sqlite:///tweets.db")
 db = dataset.connect(settings.CONNECTION_STRING)
@@ -29,6 +30,8 @@ class TwitterStreamListener(tweepy.streaming.StreamListener):
         description = status.user.description
         loc = status.user.location
         text = status.text
+        # now remove emojis
+        text = emoji.get_emoji_regexp().sub(r'', text)
         coords = status.coordinates
         name = status.user.screen_name
         user_created = status.user.created_at
@@ -83,4 +86,4 @@ listener = TwitterStreamListener()
 auth = tweepy.OAuthHandler(consumerKey, consumerSecret)
 auth.set_access_token(accessToken, accessTokenSecret)
 stream = tweepy.streaming.Stream(auth, listener)
-stream.filter(track=settings.TRACK_TERMS)
+stream.filter(track=settings.TRACK_TERMS, languages=["en"])
