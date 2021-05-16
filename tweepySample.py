@@ -48,6 +48,8 @@ class TwitterStreamListener(tweepy.streaming.StreamListener):
         if coords is not None:
             coords = json.dumps(coords)
 
+        print("text extracted: -", text)
+
         table = db[settings.TABLE_NAME]
         table.insert(dict(
         user_description=description,
