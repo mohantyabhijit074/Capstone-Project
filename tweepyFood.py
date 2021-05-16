@@ -11,11 +11,11 @@ auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
 # Open/Create a file to append data
-csvFile = open('tweets.csv', 'a')
+csvFile = open('tweets1.csv', 'a')
 #Use csv Writer
 csvWriter = csv.writer(csvFile)
 
 
-for tweet in tweepy.Cursor(api.search,q="#biryani",count=10, lang="en").items():
+for tweet in tweepy.Cursor(api.search,q="Healthy Food", lang="en").items():
     print (tweet.created_at, tweet.text)
-    # csvWriter.writerow([tweet.created_at, tweet.text.encode('utf-8')])
+    csvWriter.writerow([tweet.created_at, tweet.text.encode('utf-8')])

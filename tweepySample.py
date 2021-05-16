@@ -4,7 +4,7 @@ import dataset
 import settings
 from sqlalchemy.exc import ProgrammingError
 import json
-import emoji
+#import emoji
 
 #db = dataset.connect("sqlite:///tweets.db")
 db = dataset.connect(settings.CONNECTION_STRING)
@@ -13,7 +13,35 @@ consumerKey = 'tNR4XEQAjcNhemWhESdgJD36V'
 consumerSecret = 'bpfPt6822IBvlPTG7FoZsYvHxJCGlayFq5Y9kC5q6M4MSpXldc'
 accessToken = '711852590028365828-moNblbd17ILQIaRWYqm1PqfvqsBaF3d'
 accessTokenSecret = 'g9zcBGTLPl8L7ZqkwxkbwlDaG7SOPUgUXgXuRFn0JBbkd'
-
+def get_tweets(username):
+          
+        # Authorization to consumer key and consumer secret
+        auth = tweepy.OAuthHandler(consumerKey, consumerSecret)
+  
+        # Access to user's access key and access secret
+        auth.set_access_token(accessToken, accessTokenSecret)
+  
+        # Calling api
+        api = tweepy.API(auth)
+  
+        # 200 tweets to be extracted
+        number_of_tweets=200
+        tweets = api.user_timeline(screen_name=username)
+  
+        # Empty Array
+        tmp=[] 
+  
+        # create array of tweet information: username, 
+        # tweet id, date/time, text
+        tweets_for_csv = [tweet.text for tweet in tweets] # CSV file created 
+        for j in tweets_for_csv:
+  
+            # Appending tweets to the empty array tmp
+            tmp.append(j) 
+  
+        # Printing the tweets
+        print(tmp)
+"""
 class TwitterStreamListener(tweepy.streaming.StreamListener):
     ''' Handles data received from the stream. '''
     '''
@@ -31,7 +59,7 @@ class TwitterStreamListener(tweepy.streaming.StreamListener):
         loc = status.user.location
         text = status.text
         # now remove emojis
-        text = emoji.get_emoji_regexp().sub(r'', text)
+        #text = emoji.get_emoji_regexp().sub(r'', text)
         coords = status.coordinates
         name = status.user.screen_name
         user_created = status.user.created_at
@@ -89,3 +117,5 @@ auth = tweepy.OAuthHandler(consumerKey, consumerSecret)
 auth.set_access_token(accessToken, accessTokenSecret)
 stream = tweepy.streaming.Stream(auth, listener)
 stream.filter(track=settings.TRACK_TERMS, languages=["en"])
+"""
+get_tweets("CNN")
