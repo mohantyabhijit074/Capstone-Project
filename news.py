@@ -1,6 +1,6 @@
 from newspaper import Article
  
-url = "https://www.msn.com/en-in/news/newsindia/india-registers-326098-new-covid-19-cases-3980-deaths-in-last-24-hours/ar-BB1gKP2m?li=AAggbRN" 
+url = "https://edition.cnn.com/2021/05/10/politics/colonial-ransomware-attack-explainer/index.html" 
 # download and parse article
 article = Article(url)
 article.download()
